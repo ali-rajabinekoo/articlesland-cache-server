@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3.10-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+      - lnft-microservice_app-network
+    logging:
+      driver: none
+
+  server:
+    container_name: 'lnft_microservice'
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+      target: dev
+    volumes: 
+      - /app/node_modules
+      - ./:/app
+    depends_on:
+      - "rabbitmq"
+    ports:
+      - "3000:3000"
+    command: sh -c '/bin/wait-for-it.sh rabbitmq:5672 --timeout=30 -- npm run start:dev'
+    environment:
+      NODE_ENV: production
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+    networks:
+      - app-network
+      - lnft-microservice_app-network
+
+networks:
+  app-network:
+    driver: bridge
+  lnft-microservice_app-network:
+    external: true
