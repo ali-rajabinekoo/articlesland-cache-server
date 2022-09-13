@@ -10,4 +10,3 @@ RUN chmod +x /bin/wait-for-it.sh
 ENV NODE_ENV=development
 RUN npm install --force
 COPY . .
-CMD ["npm", "run", "dev"]
