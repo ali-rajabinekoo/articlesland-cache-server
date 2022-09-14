@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
-import { NewDraftDto, RemoveDraftDto } from './app.dto';
+import { GetDraftsDto, NewDraftDto, RemoveDraftDto } from "./app.dto";
 import { AppService } from './app.service';
 import { systemLogger } from './libs/logger';
 
@@ -18,9 +18,9 @@ export class AppController {
   }
 
   @MessagePattern({ cmd: 'getDrafts' })
-  async getAllDrafts(id: number) {
+  async getAllDrafts(fields: GetDraftsDto) {
     try {
-      return this.appService.getAllUserDraft(id);
+      return this.appService.getAllUserDraft(fields.userId, fields.articleId);
     } catch (e) {
       systemLogger.logger.error(e);
     }
