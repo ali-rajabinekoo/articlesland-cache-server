@@ -1,32 +1,34 @@
 version: '3.8'
 services:
-  database:
+  cache_db:
     image: mongo
-    container_name: 'articlesland_cache_database'
-    restart: always 
+    container_name: 'articlesLand_cache_database'
+    restart: on-failure
     ports:
       - "27017:27017"
     networks:
       - app-network
     logging:
       driver: none
-    volumes: 
+    volumes:
       - ~/.docker-data/articlesLand/mongo:/data/db
-#    environment: 
+#    environment:
 #      - MONGO_INITDB_ROOT_USERNAME=lnftUser
 #      - MONGO_INITDB_ROOT_PASSWORD=lnftlnftlnft
 
   server:
     container_name: 'articlesLand_cache_microservice'
-    build: 
+    build:
       context: ./
       dockerfile: Dockerfile
       target: dev
-    volumes: 
+    volumes:
       - /app/node_modules
       - ./:/app
-      - ~/.docker-data/articlesLand/cache:/cache
-    command: sh -c '/bin/wait-for-it.sh rabbitmq:5672 --timeout=30 -- npm run start:dev'
+      - ~/.docker-data/articlesLand/cache:/app/cache
+    command: sh -c 'chmod 777 /app/node_modules && chmod 777 /app/node_modules/**/* && /bin/wait-for-it.sh rabbitmq:5672 --timeout=30 -- npm run start:dev'
+    depends_on:
+      - "cache_db"
     environment:
       NODE_ENV: production
       AMQP_URL: amqp://rabbitmq:5672
