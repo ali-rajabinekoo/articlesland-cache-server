@@ -24,12 +24,21 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/microservices": "^9.0.11",
+    "@nestjs/mongoose": "^9.2.0",
     "@nestjs/platform-express": "^9.0.11",
+    "@types/html-to-text": "^8.1.1",
+    "@types/uuid": "^8.3.4",
     "amqp-connection-manager": "^4.1.6",
     "amqplib": "^0.10.3",
+    "html-to-text": "^8.2.1",
+    "jalali-moment": "^3.3.11",
+    "moment-timezone": "^0.5.37",
+    "mongoose": "^6.6.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "uuid": "^9.0.0",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

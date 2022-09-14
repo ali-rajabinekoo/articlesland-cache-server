@@ -1,40 +1,43 @@
 version: '3.8'
 services:
-  rabbitmq:
-    image: rabbitmq:3.10-management-alpine
-    container_name: 'rabbitmq'
+  cache_db:
+    image: mongo
+    container_name: 'articlesLand_cache_database'
+    restart: on-failure
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "27017:27017"
     networks:
       - app-network
-      - lnft-microservice_app-network
     logging:
       driver: none
+    volumes:
+      - ~/.docker-data/articlesLand/mongo:/data/db
+#    environment:
+#      - MONGO_INITDB_ROOT_USERNAME=lnftUser
+#      - MONGO_INITDB_ROOT_PASSWORD=lnftlnftlnft
 
   server:
-    container_name: 'lnft_microservice'
-    build: 
+    container_name: 'articlesLand_cache_microservice'
+    build:
       context: ./
       dockerfile: Dockerfile
       target: dev
-    volumes: 
+    volumes:
       - /app/node_modules
       - ./:/app
+      - ~/.docker-data/articlesLand/cache:/app/cache
+    command: sh -c 'chmod 777 /app/node_modules && chmod 777 /app/node_modules/**/* && /bin/wait-for-it.sh rabbitmq:5672 --timeout=30 -- npm run start:dev'
     depends_on:
-      - "rabbitmq"
-    ports:
-      - "3000:3000"
-    command: sh -c '/bin/wait-for-it.sh rabbitmq:5672 --timeout=30 -- npm run start:dev'
+      - "cache_db"
     environment:
       NODE_ENV: production
-      AMQP_URL: amqp://guest:guest@rabbitmq:5672
+      AMQP_URL: amqp://rabbitmq:5672
     networks:
       - app-network
-      - lnft-microservice_app-network
+      - articlesLand-microservice-network
 
 networks:
   app-network:
     driver: bridge
-  lnft-microservice_app-network:
+  articlesLand-microservice-network:
     external: true

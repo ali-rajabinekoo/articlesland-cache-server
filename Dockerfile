@@ -8,6 +8,5 @@ RUN wget -O /bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait
 RUN chmod +x /bin/wait-for-it.sh
 
 ENV NODE_ENV=development
-RUN npm install --force
+RUN npm install
 COPY . .
-CMD ["npm", "run", "dev"]
