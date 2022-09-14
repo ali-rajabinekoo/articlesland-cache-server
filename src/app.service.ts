@@ -1,21 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Draft, DraftDocument } from './draft.schema';
-import { Model } from 'mongoose';
-import { DraftResponseDto, NewDraftDto } from './app.dto';
-import { join } from 'path';
-import * as fs from 'fs/promises';
-import { v4 as uuidV4 } from 'uuid';
-import { htmlToText } from 'html-to-text';
-import { systemLogger } from './libs/logger';
-import { draftQueueLimit } from './libs/config';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Draft, DraftDocument } from "./draft.schema";
+import { Model } from "mongoose";
+import { DraftResponseDto, NewDraftDto } from "./app.dto";
+import { join } from "path";
+import * as fs from "fs/promises";
+import { v4 as uuidV4 } from "uuid";
+import { htmlToText } from "html-to-text";
+import { systemLogger } from "./libs/logger";
+import { draftQueueLimit } from "./libs/config";
 
 @Injectable()
 export class AppService {
   private draftDirectoryCreated = false;
 
   constructor(
-    @InjectModel(Draft.name) private draftModel: Model<DraftDocument>,
+    @InjectModel(Draft.name) private draftModel: Model<DraftDocument>
   ) {
     this.checkCacheDirectories().catch((e) => {
       if (!!e) {
@@ -30,7 +30,7 @@ export class AppService {
   }
 
   private async checkCacheDirectories(): Promise<void> {
-    const articleDir: string = join(__dirname, '../cache/drafts/');
+    const articleDir: string = join(__dirname, "../cache/drafts/");
     const catDir: string = join(__dirname, `../cache/drafts/`);
     try {
       await fs.readdir(articleDir);
@@ -59,12 +59,12 @@ export class AppService {
         exist = false;
       }
     }
-    await fs.writeFile(filePath, body, 'utf8');
+    await fs.writeFile(filePath, body, "utf8");
     return filePath;
   }
 
   private async fetchDraftBody(url: string): Promise<string> {
-    return await fs.readFile(url, 'utf8');
+    return await fs.readFile(url, "utf8");
   }
 
   private async removeSavedFile(bodyPath: string): Promise<void> {
@@ -75,37 +75,48 @@ export class AppService {
     return htmlToText(description).slice(0, 300);
   }
 
-  private async checkAndRemoveLastDraft(userId: number) {
+  private async checkAndRemoveLastDraft(userId: number, articleId: number | undefined) {
+    const query: any = { userId, articleId: null };
+    if (!!articleId) query.articleId = articleId;
     const drafts: DraftDocument[] = await this.draftModel
-      .find({ userId })
+      .find(query)
       .sort({ createdAt: -1 });
     while (
       drafts.length !== 0 &&
       !!draftQueueLimit &&
       drafts.length > draftQueueLimit
-    ) {
+      ) {
       const removableDraft: DraftDocument = drafts.pop();
       try {
         await this.removeSavedFile(removableDraft.bodyUrl);
-      } catch (e) {}
+      } catch (e) {
+      }
       await this.draftModel.deleteOne({ _id: removableDraft._id });
     }
   }
 
-  async create(createCatDto: NewDraftDto): Promise<void> {
-    const createdCat = new this.draftModel({
-      title: createCatDto.title,
-      userId: createCatDto.userId,
-      bodyUrl: await this.saveDraftBody(createCatDto.body),
-      description: this.formatDescription(createCatDto.body),
-    } as DraftDocument);
+  async create(newDraft: NewDraftDto): Promise<void> {
+    const query: DraftDocument = {
+      userId: newDraft.userId,
+      bodyUrl: await this.saveDraftBody(newDraft.body),
+      description: this.formatDescription(newDraft.body)
+    } as DraftDocument;
+    if (!!newDraft.title) {
+      query.title = newDraft.title;
+    }
+    if (!!newDraft.articleId) {
+      query.articleId = newDraft.articleId;
+    }
+    const createdCat = new this.draftModel(query);
     await createdCat.save();
-    await this.checkAndRemoveLastDraft(createCatDto.userId);
+    await this.checkAndRemoveLastDraft(newDraft.userId, newDraft.articleId);
   }
 
-  async getAllUserDraft(userId: number): Promise<DraftResponseDto[]> {
+  async getAllUserDraft(userId: number, articleId?: number | undefined): Promise<DraftResponseDto[]> {
+    const query: any = { userId, articleId: null };
+    if (!!articleId) query.articleId = articleId;
     const drafts: DraftDocument[] = await this.draftModel
-      .find({ userId })
+      .find(query)
       .sort({ createdAt: -1 });
     const response: DraftResponseDto[] = await Promise.all(
       drafts.map(
@@ -115,9 +126,9 @@ export class AppService {
           userId: el.userId,
           description: el.description,
           createdAt: String(el.createdAt),
-          body: await this.fetchDraftBody(el.bodyUrl),
-        }),
-      ),
+          body: await this.fetchDraftBody(el.bodyUrl)
+        })
+      )
     );
     return response;
   }

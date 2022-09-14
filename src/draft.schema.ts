@@ -1,27 +1,30 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import * as moment from 'moment-timezone';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
+import * as moment from "moment-timezone";
 
 const now = () => {
-  return moment.tz(Date.now(), 'Asia/Tehran').toISOString();
+  return moment.tz(Date.now(), "Asia/Tehran").toISOString();
 };
 
 @Schema()
 export class Draft {
-  @Prop()
+  @Prop({ required: false, default: null })
+  articleId?: number;
+
+  @Prop({ required: true })
   userId: number;
 
-  @Prop()
-  title: string;
+  @Prop({ default: 'بدون عنوان' })
+  title?: string;
 
-  @Prop()
+  @Prop({ required: true })
   description: string;
 
-  @Prop()
+  @Prop({ required: true })
   bodyUrl: string;
 
   @Prop({ default: now })
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 export type DraftDocument = Draft & Document;
