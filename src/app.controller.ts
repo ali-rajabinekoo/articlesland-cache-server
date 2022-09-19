@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
-import { GetDraftsDto, NewDraftDto, RemoveDraftDto } from "./app.dto";
+import { GetDraftsDto, NewDraftDto, RemoveDraftDto } from './app.dto';
 import { AppService } from './app.service';
 import { systemLogger } from './libs/logger';
 

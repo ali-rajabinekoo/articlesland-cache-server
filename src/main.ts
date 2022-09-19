@@ -14,6 +14,7 @@ async function bootstrap() {
       },
     },
   );
+  process.env.TZ = 'Asia/Tehran';
   await app.listen();
 }
 bootstrap();
