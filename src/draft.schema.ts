@@ -1,9 +1,9 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
-import * as moment from "moment-timezone";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+import * as moment from 'moment-timezone';
 
 const now = () => {
-  return moment.tz(Date.now(), "Asia/Tehran").toISOString();
+  return moment.tz(Date.now(), 'Asia/Tehran').toISOString();
 };
 
 @Schema()
