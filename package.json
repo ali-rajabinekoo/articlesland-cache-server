@@ -33,7 +33,7 @@
     "html-to-text": "^8.2.1",
     "jalali-moment": "^3.3.11",
     "moment-timezone": "^0.5.37",
-    "mongoose": "^6.6.0",
+    "mongoose": "^6.6.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
