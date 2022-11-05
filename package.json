@@ -35,7 +35,7 @@
     "amqplib": "^0.10.3",
     "html-to-text": "^8.2.1",
     "jalali-moment": "^3.3.11",
-    "moment-timezone": "^0.5.37",
+    "moment-timezone": "^0.5.38",
     "mongoose": "^6.6.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
