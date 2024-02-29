@@ -33,7 +33,7 @@
     "@types/uuid": "^8.3.4",
     "amqp-connection-manager": "^4.1.6",
     "amqplib": "^0.10.3",
-    "html-to-text": "^8.2.1",
+    "html-to-text": "^9.0.0",
     "jalali-moment": "^3.3.11",
     "moment-timezone": "^0.5.37",
     "mongoose": "^6.6.2",
